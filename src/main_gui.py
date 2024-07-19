@@ -11,6 +11,9 @@ def main_gui():
         holistor_window.geometry('400x200')
         clients = get_clients_from_sheets()
 
+        if not clients:
+            return
+
         client_name = [client['name'] for client in clients]
 
         client_var = tk.StringVar(holistor_window)
@@ -21,19 +24,11 @@ def main_gui():
         client_menu = tk.OptionMenu(holistor_window, client_var, *client_name)
         client_menu.grid()
 
-        for client in clients:
-            if client['name'] == client_var.get():
-                cuil = client['cuil']
+        def start_automation():
+            selected_client = next(client for client in clients if client['name'] == client_var.get())
+            login_and_open_vouchers(selected_client['name'], selected_client['cuil'], selected_client['type'])
 
-        companys_types = ["0000000003 - DI GIÁCOMO NICOLAS", "0000000001 - DI GIACOMO FRANCISCO", "0000000002 - DI GIÁCOMO JUAN EZEQUIEL"]
-        companys_var = tk.StringVar(holistor_window)
-        companys_var.set(companys_types[0])
-        tk.Label(holistor_window, text='Selecciona el tipo de empresa:').grid()
-        companys_menu = tk.OptionMenu(holistor_window, companys_var, *companys_types)
-        companys_menu.grid()
-
-        #Inicio de automatizacion
-        btn_login = tk.Button(holistor_window, text='Iniciar automatizacion', command=lambda: login_and_open_vouchers(client_var.get(), companys_var.get(), cuil))
+        btn_login = tk.Button(holistor_window, text='Iniciar automatización', command=start_automation)
         btn_login.grid(row=6, column=0, columnspan=2, padx=5, pady=5, sticky='w')
 
         holistor_window.mainloop()
@@ -41,6 +36,5 @@ def main_gui():
     except Exception as e:
         print('Error:', str(e))
 
-def login_and_open_vouchers(client_name, company, cuil):
-    print(client_name, cuil)
-    erp_cta_cte(client_name, company, cuil)
+def login_and_open_vouchers(client_name, cuil, client_type):
+    erp_cta_cte(client_name, cuil, client_type)

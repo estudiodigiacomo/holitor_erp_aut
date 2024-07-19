@@ -18,20 +18,15 @@ def get_clients_from_sheets():
         creds = service_account.Credentials.from_service_account_file(KEY, scopes= SCOPE)
         service = build('sheets' , 'v4', credentials= creds)
         sheet = service.spreadsheets()
-        result = sheet.values().get(spreadsheetId= SPREADSHEET_ID, range='erp_db!A2:B118').execute()
+        result = sheet.values().get(spreadsheetId= SPREADSHEET_ID, range='erp_db!A2:C119').execute()
         values = result.get('values', [])
         
         #Busqueda de datos
         if values:
             #Almaceno los clientes en una lista
-            clients = []
-            for row in values:
-                client_name, cuil = row
-                clients.append({
-                    'name': client_name, 
-                    'cuil': cuil
-                    })
+            clients = [{'name': row[0], 'cuil': row[1], 'type': row[2]} for row in values]
             return clients
+            
         else: 
             messagebox.showerror('Error', 'No se encontraron datos en la hoja de Google Sheets')
             return []
